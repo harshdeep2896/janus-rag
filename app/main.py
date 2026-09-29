@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.core.config import get_settings
+from app.infra.migrations import get_alembic_head
 from app.infra.postgres import create_pool, close_pool
 from app.infra.kafka import create_kafka_admin, check_kafka
 from app.infra.mongo import create_mongo, close_mongo, check_mongo
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     settings = get_settings()
+    app.state.alembic_head = get_alembic_head()
     app.state.pg_pool = await create_pool(settings)
     app.state.redis = create_redis(settings)
     app.state.mongo = create_mongo(settings)

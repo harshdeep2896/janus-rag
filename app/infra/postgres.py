@@ -1,5 +1,6 @@
 import time
 
+import psycopg
 from psycopg_pool import AsyncConnectionPool
 from sqlalchemy import Text
 
@@ -38,3 +39,25 @@ async def check_postgres(pool: AsyncConnectionPool) -> dict:
         return {"status": "ok", 
                 "latency_ms": round((time.perf_counter() - start) * 1000, 1), 
                 "pgvector": row[0]}
+
+async def check_schema(pool: AsyncConnectionPool, expected_head: str) -> dict:
+    start = time.perf_counter()
+    async with pool.connection() as conn:
+        try:
+            cur = await conn.execute(
+                query="SELECT version_num FROM alembic_version"
+            )
+        except psycopg.errors.UndefinedTable:
+            raise RuntimeError("alembic_version table missing, run alembic upgrade head") from None
+        
+        row = await cur.fetchone()
+        current = row[0] if row else None
+
+        if current != expected_head:
+            raise RuntimeError(f"db at {current}, code expects {expected_head}")
+
+        return {
+            "status": "ok",
+            "latency_ms": round((time.perf_counter() - start) * 1000, 1),
+            "revision": current
+        }
