@@ -1,0 +1,66 @@
+# ============================================================
+# Hybrid Search RAG (open-source, production-leaning)
+# Python 3.11+ recommended
+# After first successful install, lock exact versions:
+#   pip freeze > requirements.lock
+# ============================================================
+
+# ---------- API layer ----------
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.30
+pydantic>=2.8,<3
+pydantic-settings>=2.4,<3
+python-multipart>=0.0.9          # file uploads
+httpx>=0.27                      # async HTTP client + test client
+sse-starlette>=2.1               # server-sent events for streaming answers
+
+# ---------- LLM + orchestration ----------
+openai>=1.99
+langchain>=1.0,<2
+langchain-core>=1.0,<2
+langchain-openai>=1.0,<2
+langchain-text-splitters>=1.0,<2
+langgraph>=1.2.11,<2
+langgraph-checkpoint-postgres>=3.1.2,<4   # durable conversation state in Postgres
+tiktoken>=0.7                    # token counting / chunk sizing
+
+# ---------- Postgres + pgvector (hybrid search) ----------
+psycopg[binary,pool]>=3.2,<4     # async driver + connection pool
+pgvector>=0.3                    # vector type adapter for psycopg
+sqlalchemy>=2.0,<3               # needed by Alembic
+alembic>=1.13                    # schema migrations
+
+# ---------- Redis / Valkey ----------
+redis>=5.0                       # redis.asyncio: caching, rate limits, locks
+
+# ---------- MongoDB (config + prompt registry) ----------
+pymongo>=4.13,<5                 # includes native AsyncMongoClient (Motor is deprecated)
+
+# ---------- Kafka (event backbone) ----------
+confluent-kafka>=2.6
+
+# ---------- Temporal (durable, stateful workflows) ----------
+temporalio>=1.28,<2
+
+# ---------- Document parsing ----------
+pypdf>=5.0
+
+# ---------- Resilience ----------
+tenacity>=9.0                    # retries with backoff (outside Temporal)
+
+# ---------- Observability (LLMOps) ----------
+langfuse>=3.0                    # LLM tracing, cost, evals, datasets
+opentelemetry-sdk>=1.27
+opentelemetry-instrumentation-fastapi>=0.48b0
+prometheus-fastapi-instrumentator>=7.0
+structlog>=24.4                  # structured JSON logs
+
+# ---------- Evaluation ----------
+ragas>=0.2                       # RAG metrics: faithfulness, context precision/recall
+
+# ---------- Dev / testing ----------
+pytest>=8.3
+pytest-asyncio>=0.24
+ruff>=0.6
+mypy>=1.11
+pre-commit>=3.8
