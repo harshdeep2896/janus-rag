@@ -40,3 +40,4 @@ data/
 uploads/
 
 .temporal/
+/test_*.py
